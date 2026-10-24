@@ -10,6 +10,7 @@ import {
   PROFESSIONAL_DATA_SOURCE,
   ProfessionalDataSource,
 } from '../data/professional-data-source';
+import { RegisterProfessionalFormComponent } from '../components/register-professional-form.component';
 import { Professional } from '../model/professional';
 
 type ViewState = 'loading' | 'error' | 'empty' | 'data';
@@ -24,6 +25,7 @@ interface LoadFailure {
 @Component({
   selector: 'app-professionals-page',
   standalone: true,
+  imports: [RegisterProfessionalFormComponent],
   templateUrl: './professionals-page.component.html',
   styleUrl: './professionals-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +38,9 @@ export class ProfessionalsPageComponent {
   readonly total = signal(0);
   readonly loadingMore = signal(false);
   readonly failure = signal<LoadFailure | null>(null);
+  readonly formOpen = signal(false);
+  /** License of the last professional registered, announced above the list. */
+  readonly lastRegistered = signal<string | null>(null);
 
   private readonly page = signal(1);
   private readonly totalPages = signal(1);
@@ -74,6 +79,18 @@ export class ProfessionalsPageComponent {
     } finally {
       this.loadingMore.set(false);
     }
+  }
+
+  toggleForm(): void {
+    this.formOpen.update((open) => !open);
+    this.lastRegistered.set(null);
+  }
+
+  /** The new professional appears in its place by license order, so the list is read again. */
+  async onRegistered(professional: Professional): Promise<void> {
+    this.formOpen.set(false);
+    this.lastRegistered.set(professional.licenseNumber);
+    await this.load();
   }
 
   experience(years: number): string {
