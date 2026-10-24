@@ -31,6 +31,7 @@ async function setup(register: Register): Promise<{
         useValue: {
           listProfessionals: () => Promise.reject(new Error('not used')),
           registerProfessional: register,
+          changeStatus: () => Promise.reject(new Error('not used')),
         } satisfies ProfessionalDataSource,
       },
     ],
