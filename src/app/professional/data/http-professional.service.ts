@@ -62,6 +62,16 @@ export class HttpProfessionalService implements ProfessionalDataSource {
     );
     return toProfessional(response);
   }
+
+  async changeStatus(professionalId: string, status: ProfessionalStatus): Promise<Professional> {
+    const response = await firstValueFrom(
+      this.http.patch<ProfessionalResponse>(
+        `${PROFESSIONALS}/${encodeURIComponent(professionalId)}/status`,
+        { status },
+      ),
+    );
+    return toProfessional(response);
+  }
 }
 
 function toProfessional(response: ProfessionalResponse): Professional {
