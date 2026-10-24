@@ -112,6 +112,17 @@ describe('HttpProfessionalService', () => {
     await expect(result).resolves.toEqual(professional);
   });
 
+  it('changes the status with a patch on the professional', async () => {
+    const result = service.changeStatus(professional.id, 'INACTIVE');
+
+    const request = http.expectOne(`/api/v1/professionals/${professional.id}/status`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({ status: 'INACTIVE' });
+    request.flush({ ...professional, status: 'INACTIVE' });
+
+    await expect(result).resolves.toEqual({ ...professional, status: 'INACTIVE' });
+  });
+
   it('passes the failure of the shell client through', async () => {
     const result = service.listProfessionals(1);
 
