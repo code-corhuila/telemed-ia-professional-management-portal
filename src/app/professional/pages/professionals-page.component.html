@@ -7,5 +7,76 @@
         Perfiles de los profesionales de la salud. Todos son médicos generales.
       </p>
     </div>
+    @if (viewState() === 'data') {
+      <span class="professionals__counter" data-testid="professionals-counter">
+        {{ total() }} {{ total() === 1 ? 'profesional' : 'profesionales' }}
+      </span>
+    }
   </header>
+
+  @if (viewState() === 'loading') {
+    <div class="professionals__state" data-testid="professionals-loading" role="status">
+      <p class="professionals__state-text">Cargando profesionales...</p>
+    </div>
+  } @else if (viewState() === 'error') {
+    <div class="professionals__state" data-testid="professionals-error">
+      <p class="professionals__state-text" id="professionals-error-text" role="alert">
+        {{ failure()?.message }}
+        @if (failure()?.traceId; as traceId) {
+          <span class="professionals__reference">(referencia: {{ traceId }})</span>
+        }
+      </p>
+      <button
+        type="button"
+        class="btn btn--primary"
+        data-testid="professionals-retry"
+        aria-describedby="professionals-error-text"
+        (click)="retryLoad()"
+      >
+        Reintentar
+      </button>
+    </div>
+  } @else if (viewState() === 'empty') {
+    <div class="professionals__state" data-testid="professionals-empty">
+      <p class="professionals__state-icon" aria-hidden="true">🩺</p>
+      <p class="professionals__state-text">Aún no hay profesionales registrados.</p>
+    </div>
+  } @else {
+    <ul class="professionals__list" data-testid="professionals-list">
+      @for (item of professionals(); track item.id) {
+        <li class="professional-card" data-testid="professional-card">
+          <span class="professional-card__icon" aria-hidden="true">🩺</span>
+          <div class="professional-card__body">
+            <h2 class="professional-card__title">Licencia {{ item.licenseNumber }}</h2>
+            <p class="professional-card__meta">{{ experience(item.yearsExperience) }}</p>
+            <div class="professional-card__chips">
+              <span class="chip chip--type">Médico general</span>
+              @if (item.status === 'ACTIVE') {
+                <span class="chip chip--active">Activo</span>
+              } @else {
+                <span class="chip chip--inactive">Inactivo</span>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+    @if (hasMore()) {
+      <div class="professionals__more">
+        <button
+          type="button"
+          class="btn btn--primary"
+          data-testid="professionals-load-more"
+          [disabled]="loadingMore()"
+          (click)="loadMore()"
+        >
+          @if (loadingMore()) {
+            Cargando...
+          } @else {
+            Ver más profesionales
+          }
+        </button>
+      </div>
+    }
+  }
 </section>
