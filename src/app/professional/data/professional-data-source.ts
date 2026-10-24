@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 
 import { Page } from '../model/page';
-import { Professional } from '../model/professional';
+import { Professional, ProfessionalStatus } from '../model/professional';
 import { ProfessionalRegistration } from '../model/professional-registration';
 
 /**
@@ -24,6 +24,9 @@ export interface ProfessionalDataSource {
     registration: ProfessionalRegistration,
     idempotencyKey: string,
   ): Promise<Professional>;
+
+  /** Activates or deactivates the profile (ADMIN only, DEC-007); the same status again is safe. */
+  changeStatus(professionalId: string, status: ProfessionalStatus): Promise<Professional>;
 }
 
 export const PROFESSIONAL_DATA_SOURCE =
