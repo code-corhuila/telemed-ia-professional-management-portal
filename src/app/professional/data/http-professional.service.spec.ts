@@ -74,6 +74,44 @@ describe('HttpProfessionalService', () => {
     await expect(result).rejects.toThrow('Unknown professional type: SPECIALIST.');
   });
 
+  it('registers through the admin route with the idempotency key of the intent', async () => {
+    const registration = {
+      fullName: 'Ana Gómez',
+      email: 'ana@telemed.test',
+      identityDocument: '1075000001',
+      password: 'temporary-pass-1',
+      licenseNumber: 'RM-12345',
+      yearsExperience: 7,
+    };
+    const result = service.registerProfessional(registration, 'intent-0001');
+
+    const request = http.expectOne('/api/v1/professionals/admin/register');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.headers.get('Idempotency-Key')).toBe('intent-0001');
+    expect(request.request.body).toEqual(registration);
+    request.flush(professional, { status: 201, statusText: 'Created' });
+
+    await expect(result).resolves.toEqual(professional);
+  });
+
+  it('accepts the 200 of a repeated key as the same registration', async () => {
+    const result = service.registerProfessional(
+      {
+        fullName: 'Ana Gómez',
+        email: 'ana@telemed.test',
+        identityDocument: '1075000001',
+        password: 'temporary-pass-1',
+        licenseNumber: 'RM-12345',
+        yearsExperience: 7,
+      },
+      'intent-0001',
+    );
+
+    http.expectOne('/api/v1/professionals/admin/register').flush(professional);
+
+    await expect(result).resolves.toEqual(professional);
+  });
+
   it('passes the failure of the shell client through', async () => {
     const result = service.listProfessionals(1);
 
