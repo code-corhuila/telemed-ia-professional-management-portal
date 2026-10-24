@@ -7,12 +7,33 @@
         Perfiles de los profesionales de la salud. Todos son médicos generales.
       </p>
     </div>
-    @if (viewState() === 'data') {
-      <span class="professionals__counter" data-testid="professionals-counter">
-        {{ total() }} {{ total() === 1 ? 'profesional' : 'profesionales' }}
-      </span>
-    }
+    <div class="professionals__tools">
+      @if (viewState() === 'data') {
+        <span class="professionals__counter" data-testid="professionals-counter">
+          {{ total() }} {{ total() === 1 ? 'profesional' : 'profesionales' }}
+        </span>
+      }
+      <button
+        type="button"
+        class="btn btn--primary"
+        data-testid="register-open"
+        [attr.aria-expanded]="formOpen()"
+        (click)="toggleForm()"
+      >
+        {{ formOpen() ? 'Cerrar' : 'Registrar profesional' }}
+      </button>
+    </div>
   </header>
+
+  @if (formOpen()) {
+    <app-register-professional-form (registered)="onRegistered($event)" />
+  }
+
+  @if (lastRegistered(); as license) {
+    <p class="professionals__notice" role="status" data-testid="register-success">
+      Profesional con licencia {{ license }} registrado.
+    </p>
+  }
 
   @if (viewState() === 'loading') {
     <div class="professionals__state" data-testid="professionals-loading" role="status">
