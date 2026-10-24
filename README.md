@@ -55,3 +55,7 @@ npm run test:ci
 - `telemed-ia-docs/09-microservices/services/04-professional-service/`
 - `telemed-ia-docs/07-api/contracts/openapi/professional-service.yaml`
 - Anexo H of the repository norm.
+
+## Deploy
+
+See [deploy/README.md](deploy/README.md) to build and run the portal as a container.
