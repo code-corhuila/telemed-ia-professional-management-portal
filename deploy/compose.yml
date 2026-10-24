@@ -1,0 +1,10 @@
+services:
+  professional-management-portal:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: telemed-ia-professional-management-portal:${IMAGE_TAG:-dev}
+    container_name: telemed-professional-management-portal-${IMAGE_TAG:-dev}
+    ports:
+      - "4207:80"
+    restart: unless-stopped
