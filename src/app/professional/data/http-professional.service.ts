@@ -10,10 +10,14 @@ import {
   ProfessionalStatus,
   ProfessionalType,
 } from '../model/professional';
+import { ProfessionalRegistration } from '../model/professional-registration';
 import { ProfessionalDataSource } from './professional-data-source';
 
 /** Public route of the gateway (Anexo H): only the shell knows its host. */
 const PROFESSIONALS = '/api/v1/professionals';
+
+/** Registration of the account and the profile (ADMIN only). */
+const REGISTER = `${PROFESSIONALS}/admin/register`;
 
 /** Professionals per page; the contract allows 1 to 100. */
 const PAGE_SIZE = 20;
@@ -44,6 +48,19 @@ export class HttpProfessionalService implements ProfessionalDataSource {
       }),
     );
     return { data: response.data.map(toProfessional), meta: response.meta };
+  }
+
+  /** 201 for a new registration and 200 for a repeated key both carry the professional. */
+  async registerProfessional(
+    registration: ProfessionalRegistration,
+    idempotencyKey: string,
+  ): Promise<Professional> {
+    const response = await firstValueFrom(
+      this.http.post<ProfessionalResponse>(REGISTER, registration, {
+        headers: { 'Idempotency-Key': idempotencyKey },
+      }),
+    );
+    return toProfessional(response);
   }
 }
 
