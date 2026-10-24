@@ -1,0 +1,107 @@
+:host {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.register {
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.register__title {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.register__hint {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--color-text-soft, #4b5563);
+}
+
+.register__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text, #111827);
+}
+
+.field__input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+}
+
+.field__input:focus {
+  outline: 2px solid var(--color-primary, #2563eb);
+  outline-offset: 1px;
+}
+
+.field__input[aria-invalid='true'] {
+  border-color: var(--color-danger, #dc2626);
+}
+
+.field__error,
+.register__error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-danger-text, #991b1b);
+}
+
+.register__error {
+  margin-top: 16px;
+}
+
+.register__reference {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-muted, #6b7280);
+}
+
+.register__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn {
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn--primary {
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover, #1d4ed8);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
