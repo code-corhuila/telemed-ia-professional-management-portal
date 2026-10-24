@@ -30,13 +30,15 @@ function pageOf(
   return { data, meta: { page, limit: 20, total, totalPages } };
 }
 
-async function setup(reads: Pick<ProfessionalDataSource, 'listProfessionals'>): Promise<{
+async function setup(
+  reads: Pick<ProfessionalDataSource, 'listProfessionals'> & Partial<ProfessionalDataSource>,
+): Promise<{
   component: ProfessionalsPageComponent;
   fixture: ComponentFixture<ProfessionalsPageComponent>;
 }> {
   await TestBed.configureTestingModule({
     imports: [ProfessionalsPageComponent],
-    providers: [{ provide: PROFESSIONAL_DATA_SOURCE, useValue: withoutRegistration(reads) }],
+    providers: [{ provide: PROFESSIONAL_DATA_SOURCE, useValue: withDefaults(reads) }],
   }).compileComponents();
 
   const fixture = TestBed.createComponent(ProfessionalsPageComponent);
@@ -44,11 +46,15 @@ async function setup(reads: Pick<ProfessionalDataSource, 'listProfessionals'>): 
   return { component: fixture.componentInstance, fixture };
 }
 
-/** The list never registers; a call to it would be a bug of these tests. */
-function withoutRegistration(
-  reads: Pick<ProfessionalDataSource, 'listProfessionals'>,
+/** Operations a test does not give are not expected to be called. */
+function withDefaults(
+  given: Pick<ProfessionalDataSource, 'listProfessionals'> & Partial<ProfessionalDataSource>,
 ): ProfessionalDataSource {
-  return { ...reads, registerProfessional: () => Promise.reject(new Error('not used')) };
+  return {
+    registerProfessional: () => Promise.reject(new Error('not used')),
+    changeStatus: () => Promise.reject(new Error('not used')),
+    ...given,
+  };
 }
 
 async function settle(fixture: ComponentFixture<ProfessionalsPageComponent>): Promise<void> {
@@ -225,6 +231,78 @@ describe('ProfessionalsPageComponent', () => {
       expect(text(fixture, '[data-testid="register-success"]')).toContain('RM-1');
       expect(listProfessionals).toHaveBeenCalledTimes(2);
       expect(component.viewState()).toBe('data');
+    });
+  });
+
+  describe('profile status', () => {
+    it('deactivates a profile and shows the new status on its card', async () => {
+      const changeStatus = vi
+        .fn<ProfessionalDataSource['changeStatus']>()
+        .mockResolvedValue(professional('1', { status: 'INACTIVE' }));
+      const { fixture } = await setup({
+        listProfessionals: () => Promise.resolve(pageOf([professional('1')])),
+        changeStatus,
+      });
+      await settle(fixture);
+      expect(text(fixture, '[data-testid="status-toggle"]')).toBe('Desactivar');
+
+      query(fixture, '[data-testid="status-toggle"]')?.click();
+      await settle(fixture);
+
+      expect(changeStatus).toHaveBeenCalledWith('1', 'INACTIVE');
+      expect(text(fixture, '[data-testid="professional-card"]')).toContain('Inactivo');
+      expect(text(fixture, '[data-testid="status-toggle"]')).toBe('Activar');
+    });
+
+    it('activates an inactive profile', async () => {
+      const changeStatus = vi
+        .fn<ProfessionalDataSource['changeStatus']>()
+        .mockResolvedValue(professional('1', { status: 'ACTIVE' }));
+      const { fixture } = await setup({
+        listProfessionals: () => Promise.resolve(pageOf([professional('1', { status: 'INACTIVE' })])),
+        changeStatus,
+      });
+      await settle(fixture);
+
+      query(fixture, '[data-testid="status-toggle"]')?.click();
+      await settle(fixture);
+
+      expect(changeStatus).toHaveBeenCalledWith('1', 'ACTIVE');
+      expect(text(fixture, '[data-testid="professional-card"]')).toContain('Activo');
+    });
+
+    it('disables the button of that profile while the change is sent', async () => {
+      const { fixture } = await setup({
+        listProfessionals: () => Promise.resolve(pageOf([professional('1')])),
+        changeStatus: () => new Promise(() => {}),
+      });
+      await settle(fixture);
+
+      query(fixture, '[data-testid="status-toggle"]')?.click();
+      fixture.detectChanges();
+
+      const button = query(fixture, '[data-testid="status-toggle"]') as HTMLButtonElement;
+      expect(button.disabled).toBe(true);
+      expect(button.textContent?.trim()).toBe('Guardando...');
+    });
+
+    it('shows a failed change under its card with its reference', async () => {
+      const { fixture } = await setup({
+        listProfessionals: () => Promise.resolve(pageOf([professional('1')])),
+        changeStatus: () =>
+          Promise.reject({ status: 403, message: 'the operation is not allowed for this user', traceId: 'trace-403' }),
+      });
+      await settle(fixture);
+
+      query(fixture, '[data-testid="status-toggle"]')?.click();
+      await settle(fixture);
+
+      const error = query(fixture, '[data-testid="status-error"]');
+      expect(error?.getAttribute('role')).toBe('alert');
+      expect(error?.textContent).toContain('the operation is not allowed for this user');
+      expect(error?.textContent).toContain('trace-403');
+      expect(query(fixture, '[data-testid="status-toggle"]')?.getAttribute('aria-describedby')).toBe(error?.id);
+      expect(text(fixture, '[data-testid="professional-card"]')).toContain('Activo');
     });
   });
 });
