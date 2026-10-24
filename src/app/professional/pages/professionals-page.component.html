@@ -78,6 +78,32 @@
                 <span class="chip chip--inactive">Inactivo</span>
               }
             </div>
+            <div class="professional-card__actions">
+              <button
+                type="button"
+                class="btn btn--secondary btn--small"
+                data-testid="status-toggle"
+                [disabled]="changingId() === item.id"
+                [attr.aria-describedby]="statusFailure()?.professionalId === item.id ? 'status-error-' + item.id : null"
+                (click)="toggleStatus(item)"
+              >
+                @if (changingId() === item.id) {
+                  Guardando...
+                } @else {
+                  {{ item.status === 'ACTIVE' ? 'Desactivar' : 'Activar' }}
+                }
+              </button>
+            </div>
+            @if (statusFailure(); as failed) {
+              @if (failed.professionalId === item.id) {
+                <p class="professional-card__error" role="alert" data-testid="status-error" [id]="'status-error-' + item.id">
+                  {{ failed.message }}
+                  @if (failed.traceId) {
+                    <span class="professionals__reference">(referencia: {{ failed.traceId }})</span>
+                  }
+                </p>
+              }
+            }
           </div>
         </li>
       }
