@@ -203,4 +203,28 @@ describe('ProfessionalsPageComponent', () => {
       expect(component.professionals().map((item) => item.id)).toEqual(['new']);
     });
   });
+
+  describe('registration', () => {
+    it('opens the form, and after a registration closes it, announces it and reloads the list', async () => {
+      const listProfessionals = vi
+        .fn<ProfessionalDataSource['listProfessionals']>()
+        .mockResolvedValueOnce(pageOf([]))
+        .mockResolvedValueOnce(pageOf([professional('1')]));
+      const { component, fixture } = await setup({ listProfessionals });
+      await settle(fixture);
+      expect(query(fixture, 'app-register-professional-form')).toBeNull();
+
+      query(fixture, '[data-testid="register-open"]')?.click();
+      fixture.detectChanges();
+      expect(query(fixture, 'app-register-professional-form')).not.toBeNull();
+
+      component.onRegistered(professional('1'));
+      await settle(fixture);
+
+      expect(query(fixture, 'app-register-professional-form')).toBeNull();
+      expect(text(fixture, '[data-testid="register-success"]')).toContain('RM-1');
+      expect(listProfessionals).toHaveBeenCalledTimes(2);
+      expect(component.viewState()).toBe('data');
+    });
+  });
 });
