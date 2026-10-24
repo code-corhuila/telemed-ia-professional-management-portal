@@ -211,3 +211,28 @@
   font-size: 14px;
   font-weight: 500;
 }
+
+.professional-card__actions {
+  margin-top: 16px;
+}
+
+.professional-card__error {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-danger-text);
+}
+
+.btn--secondary {
+  background: #ffffff;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.btn--small {
+  padding: 8px 16px;
+  font-size: 13px;
+}
