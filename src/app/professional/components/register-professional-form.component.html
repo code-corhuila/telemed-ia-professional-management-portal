@@ -1,0 +1,46 @@
+<form class="register" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <h2 class="register__title">Nuevo profesional</h2>
+  <p class="register__hint">
+    Se crea su cuenta y su perfil de médico general, activo desde el registro.
+  </p>
+
+  <div class="register__grid">
+    @for (field of fields; track field.name) {
+      <div class="field">
+        <label class="field__label" [for]="'professional-' + field.name">{{ field.label }}</label>
+        <input
+          class="field__input"
+          [id]="'professional-' + field.name"
+          [type]="field.type"
+          [attr.inputmode]="field.inputmode"
+          [attr.autocomplete]="field.autocomplete"
+          [formControlName]="field.name"
+          [attr.aria-invalid]="errorOf(field.name) ? 'true' : null"
+          [attr.aria-describedby]="errorOf(field.name) ? 'professional-' + field.name + '-error' : null"
+        />
+        @if (errorOf(field.name); as message) {
+          <p class="field__error" [id]="'professional-' + field.name + '-error'">{{ message }}</p>
+        }
+      </div>
+    }
+  </div>
+
+  @if (failure(); as problem) {
+    <p class="register__error" role="alert" data-testid="register-error">
+      {{ problem.message }}
+      @if (problem.traceId) {
+        <span class="register__reference">(referencia: {{ problem.traceId }})</span>
+      }
+    </p>
+  }
+
+  <div class="register__actions">
+    <button type="submit" class="btn btn--primary" data-testid="register-submit" [disabled]="submitting()">
+      @if (submitting()) {
+        Registrando...
+      } @else {
+        Registrar
+      }
+    </button>
+  </div>
+</form>
