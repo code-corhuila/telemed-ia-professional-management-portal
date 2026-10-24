@@ -11,7 +11,7 @@ import {
   ProfessionalDataSource,
 } from '../data/professional-data-source';
 import { RegisterProfessionalFormComponent } from '../components/register-professional-form.component';
-import { Professional } from '../model/professional';
+import { Professional, ProfessionalStatus } from '../model/professional';
 
 type ViewState = 'loading' | 'error' | 'empty' | 'data';
 
@@ -39,6 +39,9 @@ export class ProfessionalsPageComponent {
   readonly loadingMore = signal(false);
   readonly failure = signal<LoadFailure | null>(null);
   readonly formOpen = signal(false);
+  /** The profile whose status is being changed, so only its button waits. */
+  readonly changingId = signal<string | null>(null);
+  readonly statusFailure = signal<(LoadFailure & { readonly professionalId: string }) | null>(null);
   /** License of the last professional registered, announced above the list. */
   readonly lastRegistered = signal<string | null>(null);
 
@@ -91,6 +94,23 @@ export class ProfessionalsPageComponent {
     this.formOpen.set(false);
     this.lastRegistered.set(professional.licenseNumber);
     await this.load();
+  }
+
+  async toggleStatus(professional: Professional): Promise<void> {
+    if (this.changingId() !== null) {
+      return;
+    }
+    const next: ProfessionalStatus = professional.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    this.changingId.set(professional.id);
+    this.statusFailure.set(null);
+    try {
+      const changed = await this.dataSource.changeStatus(professional.id, next);
+      this.professionals.update((items) => items.map((item) => (item.id === changed.id ? changed : item)));
+    } catch (error: unknown) {
+      this.statusFailure.set({ ...toFailure(error), professionalId: professional.id });
+    } finally {
+      this.changingId.set(null);
+    }
   }
 
   experience(years: number): string {
