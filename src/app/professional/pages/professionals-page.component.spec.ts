@@ -30,18 +30,25 @@ function pageOf(
   return { data, meta: { page, limit: 20, total, totalPages } };
 }
 
-async function setup(source: ProfessionalDataSource): Promise<{
+async function setup(reads: Pick<ProfessionalDataSource, 'listProfessionals'>): Promise<{
   component: ProfessionalsPageComponent;
   fixture: ComponentFixture<ProfessionalsPageComponent>;
 }> {
   await TestBed.configureTestingModule({
     imports: [ProfessionalsPageComponent],
-    providers: [{ provide: PROFESSIONAL_DATA_SOURCE, useValue: source }],
+    providers: [{ provide: PROFESSIONAL_DATA_SOURCE, useValue: withoutRegistration(reads) }],
   }).compileComponents();
 
   const fixture = TestBed.createComponent(ProfessionalsPageComponent);
   fixture.detectChanges();
   return { component: fixture.componentInstance, fixture };
+}
+
+/** The list never registers; a call to it would be a bug of these tests. */
+function withoutRegistration(
+  reads: Pick<ProfessionalDataSource, 'listProfessionals'>,
+): ProfessionalDataSource {
+  return { ...reads, registerProfessional: () => Promise.reject(new Error('not used')) };
 }
 
 async function settle(fixture: ComponentFixture<ProfessionalsPageComponent>): Promise<void> {
