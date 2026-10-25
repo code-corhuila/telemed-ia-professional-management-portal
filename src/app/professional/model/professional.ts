@@ -8,11 +8,14 @@ export type ProfessionalStatus = (typeof PROFESSIONAL_STATUSES)[number];
 
 /**
  * `Professional` of `07-api/contracts/openapi/professional-service.yaml`, with the
- * same field names. Name and e-mail live in the identity domain, not here.
+ * same field names. The name and e-mail belong to the account in the identity domain;
+ * the API adds them when it can read them (DEC-008).
  */
 export interface Professional {
   readonly id: string;
   readonly identityUserId: string;
+  readonly fullName?: string;
+  readonly email?: string;
   readonly licenseNumber: string;
   readonly professionalType: ProfessionalType;
   readonly status: ProfessionalStatus;
