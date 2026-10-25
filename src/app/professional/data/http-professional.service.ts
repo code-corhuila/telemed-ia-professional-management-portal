@@ -25,6 +25,8 @@ const PAGE_SIZE = 20;
 interface ProfessionalResponse {
   readonly id: string;
   readonly identityUserId: string;
+  readonly fullName?: string;
+  readonly email?: string;
   readonly licenseNumber: string;
   readonly professionalType: string;
   readonly status: string;
@@ -78,6 +80,8 @@ function toProfessional(response: ProfessionalResponse): Professional {
   return {
     id: response.id,
     identityUserId: response.identityUserId,
+    ...(typeof response.fullName === 'string' ? { fullName: response.fullName } : {}),
+    ...(typeof response.email === 'string' ? { email: response.email } : {}),
     licenseNumber: response.licenseNumber,
     professionalType: oneOf<ProfessionalType>(PROFESSIONAL_TYPES, response.professionalType, 'type'),
     status: oneOf<ProfessionalStatus>(PROFESSIONAL_STATUSES, response.status, 'status'),
