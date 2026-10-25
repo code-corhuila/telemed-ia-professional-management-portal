@@ -68,8 +68,18 @@
         <li class="professional-card" data-testid="professional-card">
           <span class="professional-card__icon" aria-hidden="true">🩺</span>
           <div class="professional-card__body">
-            <h2 class="professional-card__title">Licencia {{ item.licenseNumber }}</h2>
-            <p class="professional-card__meta">{{ experience(item.yearsExperience) }}</p>
+            @if (item.fullName) {
+              <h2 class="professional-card__title">{{ item.fullName }}</h2>
+              <p class="professional-card__meta">
+                Licencia {{ item.licenseNumber }} · {{ experience(item.yearsExperience) }}
+              </p>
+              @if (item.email) {
+                <p class="professional-card__email">{{ item.email }}</p>
+              }
+            } @else {
+              <h2 class="professional-card__title">Licencia {{ item.licenseNumber }}</h2>
+              <p class="professional-card__meta">{{ experience(item.yearsExperience) }}</p>
+            }
             <div class="professional-card__chips">
               <span class="chip chip--type">Médico general</span>
               @if (item.status === 'ACTIVE') {
