@@ -132,6 +132,13 @@
   color: var(--color-text-soft);
 }
 
+.professional-card__email {
+  margin: -8px 0 14px;
+  font-size: 13px;
+  color: var(--color-text-soft);
+  overflow-wrap: anywhere;
+}
+
 .professional-card__chips {
   display: flex;
   flex-wrap: wrap;
