@@ -138,6 +138,30 @@ describe('ProfessionalsPageComponent', () => {
       expect(card).toContain('Activo');
     });
 
+    it('shows the name and e-mail of the account, and the license under it', async () => {
+      const { fixture } = await setup({
+        listProfessionals: () =>
+          Promise.resolve(
+            pageOf([professional('1', { fullName: 'Ana Gómez', email: 'ana@telemed.test' })]),
+          ),
+      });
+      await settle(fixture);
+
+      expect(text(fixture, '.professional-card__title')).toBe('Ana Gómez');
+      const card = text(fixture, '[data-testid="professional-card"]');
+      expect(card).toContain('Licencia RM-1');
+      expect(card).toContain('ana@telemed.test');
+    });
+
+    it('shows the license as the title when the name did not arrive', async () => {
+      const { fixture } = await setup({
+        listProfessionals: () => Promise.resolve(pageOf([professional('1')])),
+      });
+      await settle(fixture);
+
+      expect(text(fixture, '.professional-card__title')).toBe('Licencia RM-1');
+    });
+
     it('uses the singular for one year and marks an inactive profile', async () => {
       const { fixture } = await setup({
         listProfessionals: () =>
@@ -252,6 +276,21 @@ describe('ProfessionalsPageComponent', () => {
       expect(changeStatus).toHaveBeenCalledWith('1', 'INACTIVE');
       expect(text(fixture, '[data-testid="professional-card"]')).toContain('Inactivo');
       expect(text(fixture, '[data-testid="status-toggle"]')).toBe('Activar');
+    });
+
+    it('keeps the name on the card after the change, which answers without it', async () => {
+      const { fixture } = await setup({
+        listProfessionals: () =>
+          Promise.resolve(pageOf([professional('1', { fullName: 'Ana Gómez', email: 'ana@telemed.test' })])),
+        changeStatus: () => Promise.resolve(professional('1', { status: 'INACTIVE' })),
+      });
+      await settle(fixture);
+
+      query(fixture, '[data-testid="status-toggle"]')?.click();
+      await settle(fixture);
+
+      expect(text(fixture, '.professional-card__title')).toBe('Ana Gómez');
+      expect(text(fixture, '[data-testid="professional-card"]')).toContain('Inactivo');
     });
 
     it('activates an inactive profile', async () => {

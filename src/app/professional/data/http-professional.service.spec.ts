@@ -52,6 +52,32 @@ describe('HttpProfessionalService', () => {
     });
   });
 
+  it('keeps the name and e-mail of the account when the API returns them', async () => {
+    const result = service.listProfessionals(1);
+
+    http.expectOne(() => true).flush({
+      data: [{ ...professional, fullName: 'Ana Gómez', email: 'ana@telemed.test' }],
+      meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
+    });
+
+    const page = await result;
+    expect(page.data[0].fullName).toBe('Ana Gómez');
+    expect(page.data[0].email).toBe('ana@telemed.test');
+  });
+
+  it('leaves the name out when the API does not return it', async () => {
+    const result = service.listProfessionals(1);
+
+    http.expectOne(() => true).flush({
+      data: [professional],
+      meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
+    });
+
+    const page = await result;
+    expect('fullName' in page.data[0]).toBe(false);
+    expect('email' in page.data[0]).toBe(false);
+  });
+
   it('rejects a status the contract does not define', async () => {
     const result = service.listProfessionals(1);
 
