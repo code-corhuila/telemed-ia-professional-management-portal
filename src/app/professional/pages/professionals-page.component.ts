@@ -105,7 +105,14 @@ export class ProfessionalsPageComponent {
     this.statusFailure.set(null);
     try {
       const changed = await this.dataSource.changeStatus(professional.id, next);
-      this.professionals.update((items) => items.map((item) => (item.id === changed.id ? changed : item)));
+      // The change answers without the account's name, so the card keeps the one it has.
+      this.professionals.update((items) =>
+        items.map((item) =>
+          item.id === changed.id
+            ? { ...changed, fullName: changed.fullName ?? item.fullName, email: changed.email ?? item.email }
+            : item,
+        ),
+      );
     } catch (error: unknown) {
       this.statusFailure.set({ ...toFailure(error), professionalId: professional.id });
     } finally {
