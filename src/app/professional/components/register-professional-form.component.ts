@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validato
 import { PROFESSIONAL_DATA_SOURCE } from '../data/professional-data-source';
 import { Professional } from '../model/professional';
 import { ProfessionalRegistration } from '../model/professional-registration';
+import { asApiError } from '../../shell-contract';
 
 type Field = keyof ProfessionalRegistration;
 
@@ -130,20 +131,13 @@ export class RegisterProfessionalFormComponent {
 
   /** Field errors go next to their field; anything else, with its reference, above the button. */
   private fail(error: unknown): void {
-    const apiError = (error ?? {}) as {
-      message?: unknown;
-      traceId?: unknown;
-      details?: ReadonlyArray<{ field: string; message: string }>;
-    };
+    const apiError = asApiError(error, 'No pudimos registrar al profesional.');
     const fields = (apiError.details ?? []).filter((detail) => detail.field in this.form.controls);
     if (fields.length > 0) {
       this.serverErrors.set(Object.fromEntries(fields.map((detail) => [detail.field, detail.message])));
       return;
     }
-    this.failure.set({
-      message: typeof apiError.message === 'string' ? apiError.message : 'No pudimos registrar al profesional.',
-      traceId: typeof apiError.traceId === 'string' ? apiError.traceId : undefined,
-    });
+    this.failure.set({ message: apiError.message, traceId: apiError.traceId });
   }
 }
 
