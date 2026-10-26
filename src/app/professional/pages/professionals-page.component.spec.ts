@@ -122,6 +122,17 @@ describe('ProfessionalsPageComponent', () => {
 
       expect(component.viewState()).toBe('data');
     });
+
+    it('shows its own message when the answer breaks the contract', async () => {
+      const { fixture } = await setup({
+        listProfessionals: () => Promise.reject(new Error('Unknown professional status: RETIRED.')),
+      });
+      await settle(fixture);
+
+      const error = text(fixture, '[data-testid="professionals-error"]');
+      expect(error).toContain('No pudimos cargar los profesionales.');
+      expect(error).not.toContain('RETIRED');
+    });
   });
 
   describe('a professional card', () => {
