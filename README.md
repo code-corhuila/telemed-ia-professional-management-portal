@@ -30,6 +30,9 @@ The professional-management domain UI, for administrators: the professional prof
   its interceptor (gateway URL, token, `X-Correlation-Id`, timeout, errors). The portal never
   calls `provideHttpClient()` and never stores a token (Anexo H).
 - It asks for relative routes (`/api/v1/professionals`); only the shell knows the gateway.
+- `src/app/shell-contract.ts` declares what the shell guarantees: a failed request rejects with
+  its `ApiError` (`status`, `code`, `message`, `details`, `traceId`), mirrored from
+  `telemed-ia-front/src/app/core/http/api-error.ts`. Pages read failures with `asApiError`.
 
 ## How to run
 
