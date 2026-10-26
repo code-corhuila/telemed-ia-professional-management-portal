@@ -9,8 +9,8 @@ import { ProfessionalRegistration } from '../model/professional-registration';
  * HttpProfessionalService, which calls the professional-management -api
  * through the shell's HttpClient.
  *
- * Failures reject with the error the shell client normalised (ApiError:
- * status, code, message, traceId).
+ * Failures reject with the error the shell client normalised (ApiError of
+ * ../../shell-contract.ts).
  */
 export interface ProfessionalDataSource {
   /** Page numbers start at 1; ordered by license number. */

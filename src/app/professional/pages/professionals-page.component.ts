@@ -12,6 +12,7 @@ import {
 } from '../data/professional-data-source';
 import { RegisterProfessionalFormComponent } from '../components/register-professional-form.component';
 import { Professional, ProfessionalStatus } from '../model/professional';
+import { asApiError } from '../../shell-contract';
 
 type ViewState = 'loading' | 'error' | 'empty' | 'data';
 
@@ -151,14 +152,7 @@ export class ProfessionalsPageComponent {
   }
 }
 
-/** The shell client rejects with an ApiError: status, code, message, traceId. */
 function toFailure(error: unknown): LoadFailure {
-  if (error && typeof error === 'object' && 'message' in error) {
-    const apiError = error as { message: unknown; traceId?: unknown };
-    return {
-      message: String(apiError.message),
-      traceId: typeof apiError.traceId === 'string' ? apiError.traceId : undefined,
-    };
-  }
-  return { message: 'No pudimos cargar los profesionales.' };
+  const { message, traceId } = asApiError(error, 'No pudimos cargar los profesionales.');
+  return { message, traceId };
 }
