@@ -1,0 +1,66 @@
+<section class="own-profile" aria-labelledby="own-profile-title">
+  <header class="own-profile__header">
+    <p class="own-profile__eyebrow">Cuenta profesional</p>
+    <h1 class="own-profile__title" id="own-profile-title">Mi perfil</h1>
+    <p class="own-profile__subtitle">Datos de tu registro profesional en TeleMed IA.</p>
+  </header>
+
+  @switch (viewState()) {
+    @case ('loading') {
+      <div class="card card--muted" role="status" aria-live="polite">Cargando tu perfil…</div>
+    }
+    @case ('missing') {
+      <div class="card card--muted" data-testid="own-profile-missing" role="status">
+        Tu perfil profesional aún no está registrado. Pide al administrador que lo complete.
+      </div>
+    }
+    @case ('error') {
+      <div class="card card--error" role="alert">
+        <p class="card__message">{{ failure()?.message }}</p>
+        @if (failure()?.traceId) {
+          <p class="card__trace">Código de seguimiento: {{ failure()?.traceId }}</p>
+        }
+        <button type="button" class="btn" data-testid="own-profile-retry" (click)="load()">
+          Reintentar
+        </button>
+      </div>
+    }
+    @case ('data') {
+      @if (profile(); as own) {
+        <article class="card">
+          <div class="identity">
+            <span class="identity__avatar" aria-hidden="true">{{ initials(own.fullName) }}</span>
+            <div>
+              <h2 class="identity__name">{{ own.fullName ?? 'Profesional' }}</h2>
+              @if (own.email) {
+                <p class="identity__email">{{ own.email }}</p>
+              }
+            </div>
+            <span
+              class="badge"
+              [class.badge--active]="own.status === 'ACTIVE'"
+              [class.badge--inactive]="own.status !== 'ACTIVE'"
+            >
+              {{ own.status === 'ACTIVE' ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <dl class="facts">
+            <div class="facts__item">
+              <dt>Registro médico</dt>
+              <dd>{{ own.licenseNumber }}</dd>
+            </div>
+            <div class="facts__item">
+              <dt>Tipo</dt>
+              <dd>Médico general</dd>
+            </div>
+            <div class="facts__item">
+              <dt>Experiencia</dt>
+              <dd>{{ own.yearsExperience }} {{ own.yearsExperience === 1 ? 'año' : 'años' }}</dd>
+            </div>
+          </dl>
+        </article>
+      }
+    }
+  }
+</section>

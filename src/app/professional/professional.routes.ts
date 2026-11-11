@@ -17,9 +17,22 @@ export const PROFESSIONAL_ROUTES: Routes = [
       HttpProfessionalService,
       { provide: PROFESSIONAL_DATA_SOURCE, useExisting: HttpProfessionalService },
     ],
-    loadComponent: () =>
-      import('./pages/professionals-page.component').then(
-        (m) => m.ProfessionalsPageComponent,
-      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/professionals-page.component').then(
+            (m) => m.ProfessionalsPageComponent,
+          ),
+      },
+      {
+        // DEC-016: the signed-in professional's own profile.
+        path: 'me',
+        loadComponent: () =>
+          import('./pages/own-profile-page.component').then(
+            (m) => m.OwnProfilePageComponent,
+          ),
+      },
+    ],
   },
 ];
