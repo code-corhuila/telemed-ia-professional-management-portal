@@ -25,6 +25,9 @@ export interface ProfessionalDataSource {
     idempotencyKey: string,
   ): Promise<Professional>;
 
+  /** The calling professional's own profile (DEC-016); rejects with 404 when it has none. */
+  getOwnProfessional(): Promise<Professional>;
+
   /** Activates or deactivates the profile (ADMIN only, DEC-007); the same status again is safe. */
   changeStatus(professionalId: string, status: ProfessionalStatus): Promise<Professional>;
 }
