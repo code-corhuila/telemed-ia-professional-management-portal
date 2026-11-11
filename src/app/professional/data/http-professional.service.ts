@@ -65,8 +65,11 @@ export class HttpProfessionalService implements ProfessionalDataSource {
     return toProfessional(response);
   }
 
+  /** DEC-016: the profile of the signed-in professional. */
   async getOwnProfessional(): Promise<Professional> {
-    throw new Error('not implemented');
+    return toProfessional(
+      await firstValueFrom(this.http.get<ProfessionalResponse>(`${PROFESSIONALS}/me`)),
+    );
   }
 
   async changeStatus(professionalId: string, status: ProfessionalStatus): Promise<Professional> {
