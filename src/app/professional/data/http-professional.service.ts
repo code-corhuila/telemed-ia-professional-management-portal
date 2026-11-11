@@ -65,6 +65,10 @@ export class HttpProfessionalService implements ProfessionalDataSource {
     return toProfessional(response);
   }
 
+  async getOwnProfessional(): Promise<Professional> {
+    throw new Error('not implemented');
+  }
+
   async changeStatus(professionalId: string, status: ProfessionalStatus): Promise<Professional> {
     const response = await firstValueFrom(
       this.http.patch<ProfessionalResponse>(
