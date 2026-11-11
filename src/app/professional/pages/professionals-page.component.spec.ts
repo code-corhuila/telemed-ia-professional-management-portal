@@ -53,6 +53,7 @@ function withDefaults(
   return {
     registerProfessional: () => Promise.reject(new Error('not used')),
     changeStatus: () => Promise.reject(new Error('not used')),
+    getOwnProfessional: () => Promise.reject(new Error('not used')),
     ...given,
   };
 }

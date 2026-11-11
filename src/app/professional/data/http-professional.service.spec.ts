@@ -159,4 +159,18 @@ describe('HttpProfessionalService', () => {
 
     await expect(result).rejects.toBeDefined();
   });
+
+  it('reads the own profile of the professional at /me (DEC-016)', async () => {
+    const result = service.getOwnProfessional();
+
+    const request = http.expectOne('/api/v1/professionals/me');
+    expect(request.request.method).toBe('GET');
+    request.flush({ ...professional, fullName: 'Ana Gómez', email: 'ana@telemed.test' });
+
+    await expect(result).resolves.toEqual({
+      ...professional,
+      fullName: 'Ana Gómez',
+      email: 'ana@telemed.test',
+    });
+  });
 });
